@@ -1,5 +1,5 @@
 
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 before(done => {
   mongoose.connect('mongodb://localhost/taxi_test')
