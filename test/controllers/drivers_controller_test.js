@@ -7,6 +7,7 @@ const app       = require('../../app')
 const Driver    = mongoose.model('driver')
 
 describe('Drivers controller', () => {
+
   it('POST to /api/drivers creates a new driver', done => {
     Driver.count().then(count => {
       request(app)
@@ -52,5 +53,28 @@ describe('Drivers controller', () => {
             })
         })
     })
+  })
+
+  it('GET to api/drivers finds drivers in a location', done => {
+    const seattleDriver = new Driver({
+      email: 'seattle@test.com',
+      geometry: { type: 'Point', coordinates: [-122, 47] }
+    })
+
+    const maimiDriver = new Driver({
+      email: 'miami@test.com',
+      geometry: { type: 'Point', coordinates: [-80, 25] }
+    })
+
+    Promise.all([ seattleDriver.save(), maimiDriver.save() ])
+      .then(() => {
+        request(app)
+          .get('/api/drivers?lng=-80&lat=25')
+          .end((err, response) => {
+            assert(response.body.length ===1 )
+            assert(response.body[0].obj.email === 'miami@test.com')
+            done()
+          })
+      })
   })
 })
